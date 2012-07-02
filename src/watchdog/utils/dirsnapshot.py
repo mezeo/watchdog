@@ -99,6 +99,12 @@ class DirectorySnapshotDiff(object):
             self._dirs_modified.append(path)
           else:
             self._files_modified.append(path)
+        elif stat_info.st_ino != ref_stat_info.st_ino:
+          # Treat new items at the same location as 'modifications'
+          if stat.S_ISDIR(stat_info.st_mode):
+            self._dirs_modified.append(path)
+          else:
+            self._files_modified.append(path)
 
     paths_deleted = ref_dirsnap.paths - dirsnap.paths
     paths_created = dirsnap.paths - ref_dirsnap.paths
@@ -324,4 +330,3 @@ class DirectorySnapshot(object):
 
   def __repr__(self):
     return str(self._stat_snapshot)
-
