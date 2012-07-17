@@ -97,8 +97,13 @@ if platform.is_darwin():
           self.queue_event(DirMovedEvent(src_path, dest_path))
 
         # Files.
+        # Only issue deletes for 'files' who's parent's were not deleted
         for src_path in events.files_deleted:
-          self.queue_event(FileDeletedEvent(src_path))
+          parent, _name = os.path.split(src_path)
+          for path in events.dirs_deleted:
+            if not parent.startswith(path):
+              self.queue_event(FileDeletedEvent(src_path))
+
         for src_path in events.files_modified:
           self.queue_event(FileModifiedEvent(src_path))
         for src_path in events.files_created:
